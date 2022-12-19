@@ -22,37 +22,30 @@ spencershepard (GRIMM):
  -damage model for ground units that will disable their weapons and ability to move with partial damage before they are killed
  -added options table to allow easy adjustments before release
  -general refactoring and restructure
- 
- 31 December 2021
- spencershepard (GRIMM):
--added many new weapons
--added filter for weapons.shells events
--fixed mission weapon message option
--changed default for damage_model option
- 
- 16 April 2022
- spencershepard (GRIMM):
- added new/missing weapons to explTable
- added new option rocket_multiplier
 --]]
+
+--21 December 2022
+--Gator:
+--  Added Real World Values based off data of kill radius of a MK82 Bomb
+-- 500lb bomb is 197 with 89kg of TNT. All other values are based off the real world weight of explosives in kg
+
 
 ----[[ ##### SCRIPT CONFIGURATION ##### ]]----
 
 splash_damage_options = {
-  ["static_damage_boost"] = 2000, --apply extra damage to Unit.Category.STRUCTUREs with wave explosions
+  ["static_damage_boost"] = 100, --apply extra damage to Unit.Category.STRUCTUREs with wave explosions
   ["wave_explosions"] = true, --secondary explosions on top of game objects, radiating outward from the impact point and scaled based on size of object and distance from weapon impact point
   ["larger_explosions"] = true, --secondary explosions on top of weapon impact points, dictated by the values in the explTable
-  ["damage_model"] = false, --allow blast wave to affect ground unit movement and weapons
-  ["blast_search_radius"] = 100, --this is the max size of any blast wave radius, since we will only find objects within this zone
-  ["cascade_damage_threshold"] = 0.1, --if the calculated blast damage doesn't exeed this value, there will be no secondary explosion damage on the unit.  If this value is too small, the appearance of explosions far outside of an expected radius looks incorrect.
-  ["game_messages"] = true, --enable some messages on screen
+  ["damage_model"] = true, --allow blast wave to affect ground unit movement and weapons
+  ["blast_search_radius"] = 5000, --this is the max size of any blast wave radius, since we will only find objects within this zone
+  ["cascade_damage_threshold"] = 5, --if the calculated blast damage doesn't exeed this value, there will be no secondary explosion damage on the unit.  If this value is too small, the appearance of explosions far outside of an expected radius looks incorrect.
+  ["game_messages"] = false, --enable some messages on screen
   ["blast_stun"] = false, --not implemented
-  ["unit_disabled_health"] = 30, --if health is below this value after our explosions, disable its movement 
-  ["unit_cant_fire_health"] = 50, --if health is below this value after our explosions, set ROE to HOLD to simulate damage weapon systems
+  ["unit_disabled_health"] = 90, --if health is below this value after our explosions, disable its movement 
+  ["unit_cant_fire_health"] = 80, --if health is below this value after our explosions, set ROE to HOLD to simulate damage weapon systems
   ["infantry_cant_fire_health"] = 90,  --if health is below this value after our explosions, set ROE to HOLD to simulate severe injury
   ["debug"] = false,  --enable debugging messages
-  ["weapon_missing_message"] = false, --false disables messages alerting you to weapons missing from the explTable
-  ["rocket_multiplier"] = 1.3, --multiplied by the explTable value for rockets
+  ["weapon_missing_message"] = true, --false disables messages alerting you to weapons missing from the explTable
 }
 
 local script_enable = 1
@@ -60,7 +53,27 @@ refreshRate = 0.1
 
 ----[[ ##### End of SCRIPT CONFIGURATION ##### ]]----
 
+
+--500lb bomb is 197 based on 89kg of TNT
+--2000lb bomb is 1000 based on 1400kg of TNT
+--Hydra rockets are 4 based on 2kg of TNT
 explTable = {
+  ["BGM_109B"] = 1000,
+  ["BGM_109C"] = 1000,
+  ["AIM_120C"] = 44,
+  ["AIM_120B"] = 48,
+  ["AIM_9X"] = 20,
+  ["AIM_9M"] = 20,
+  ["AIM_9L"] = 20,
+  ["AGM_88"] = 150,
+  ["AGR_20A"] = 4,
+  ["BLU_97B"] = 50,
+  ["BLU_108"] = 50,
+  ["CBU_105"] = 1,
+  ["CBU_97"] = 1,
+  ["CBU_87"] = 1,
+  ["CBU_103"] = 10,
+  ["AGR_20_M282"] = 14,
   ["FAB_100"] = 45,
   ["FAB_250"] = 100,
   ["FAB_250M54TU"]= 100,
@@ -69,28 +82,35 @@ explTable = {
   ["BetAB_500"] = 98,
   ["BetAB_500ShP"]= 107,
   ["KH-66_Grom"]  = 108,
-  ["M_117"] = 201,
-  ["Mk_81"] = 60,
-  ["Mk_82"] = 118,
-  ["AN_M64"]  = 121,
-  ["Mk_83"] = 274,
-  ["Mk_84"] = 582,
-  ["MK_82AIR"]  = 118,
-  ["MK_82SNAKEYE"]= 118,
-  ["GBU_10"]  = 582,
-  ["GBU_12"]  = 118,
+  ["M_117"] = 405,
+  ["Mk_81"] = 97,
+  ["Mk_82"] = 197,
+  ["AN_M64"]  = 275,
+  ["Mk_83"] = 447,
+  ["Mk_84"] = 1000,
+  ["MK_82AIR"]  = 197,
+  ["MK_82SNAKEYE"]= 197,
+  ["GBU_10"]  = 1000,
+  ["GBU_12"]  = 197,
+  ["GBU_54B"]  = 197,
   ["GBU_16"]  = 274,
   ["KAB_1500Kr"]  = 675,
   ["KAB_500Kr"] = 213,
   ["KAB_500"] = 213,
-  ["GBU_31"]  = 582,
-  ["GBU_31_V_3B"] = 582,
-  ["GBU_31_V_2B"] = 582,
-  ["GBU_31_V_4B"] = 582,
+  ["GBU_31"]  = 1000,
+  ["GBU_31_V_3B"] = 1000,
+  ["GBU_31_V_2B"] = 1000,
+  ["GBU_31_V_4B"] = 1000,
   ["GBU_32_V_2B"] = 202,
-  ["GBU_38"]  = 118,
+  ["GBU_54_V_1B"] = 197,
+  ["GBU_38"]  = 197,
   ["AGM_62"]  = 400,
-  ["GBU_24"]  = 582,
+  ["AGM_65D"]  = 134,
+  ["AGM_65L"]  = 134,
+  ["AGM_65G"]  = 319,
+  ["AGM_65H"]  = 134,
+  ["AGM_65K"]  = 134,
+  ["GBU_24"]  = 1000,
   ["X_23"]  = 111,
   ["X_23L"] = 111,
   ["X_28"]  = 160,
@@ -101,15 +121,14 @@ explTable = {
   ["X_29L"] = 320,
   ["X_29T"] = 320,
   ["X_29TE"]  = 320,
-  ["AGM_84E"] = 488,
-  ["AGM_88C"] = 89,
-  ["AGM_122"] = 15,
-  ["AGM_123"] = 274,
-  ["AGM_130"] = 582,
-  ["AGM_119"] = 176,
-  ["AGM_154C"]  = 305,
+  ["AGM_84E"] = 797,
+  ["AGM_88C"] = 197,
+  ["AGM_122"] = 25,
+  ["AGM_123"] = 996,
+  ["AGM_130"] = 2007,
+  ["AGM_119"] = 288,
+  ["AGM_154C"]  = 10,
   ["S-24A"] = 24,
-  --["S-24B"] = 123,
   ["S-25OF"]  = 194,
   ["S-25OFM"] = 150,
   ["S-25O"] = 150,
@@ -120,10 +139,10 @@ explTable = {
   ["C_13"]  = 21,
   ["C_24"]  = 123,
   ["C_25"]  = 151,
-  ["HYDRA_70M15"] = 3,
+  ["HYDRA_70M15"] = 14,
   ["Zuni_127"]  = 5,
   ["ARAKM70BHE"]  = 4,
-  ["BR_500"]  = 118,
+  ["BR_500"]  = 197,
   ["Rb 05A"]  = 217,
   ["HEBOMB"]  = 40,
   ["HEBOMBD"] = 40,
@@ -132,52 +151,10 @@ explTable = {
   ["AN-M64"]  = 180,
   ["AN-M65"]  = 295,
   ["AN-M66A2"]  = 536,
-  ["HYDRA_70_M151"] = 4,
-  ["HYDRA_70_MK5"] = 4,
-  ["Vikhr_M"] = 11,
-  ["British_GP_250LB_Bomb_Mk1"] = 100,           --("250 lb GP Mk.I")
-  ["British_GP_250LB_Bomb_Mk4"] = 100,           --("250 lb GP Mk.IV")
-  ["British_GP_250LB_Bomb_Mk5"] = 100,           --("250 lb GP Mk.V")
-  ["British_GP_500LB_Bomb_Mk1"] = 213,           --("500 lb GP Mk.I")
-  ["British_GP_500LB_Bomb_Mk4"] = 213,           --("500 lb GP Mk.IV")
-  ["British_GP_500LB_Bomb_Mk4_Short"] = 213,     --("500 lb GP Short tail")
-  ["British_GP_500LB_Bomb_Mk5"] = 213,           --("500 lb GP Mk.V")
-  ["British_MC_250LB_Bomb_Mk1"] = 100,           --("250 lb MC Mk.I")
-  ["British_MC_250LB_Bomb_Mk2"] = 100,           --("250 lb MC Mk.II")
-  ["British_MC_500LB_Bomb_Mk1_Short"] = 213,     --("500 lb MC Short tail")
-  ["British_MC_500LB_Bomb_Mk2"] = 213,           --("500 lb MC Mk.II")
-  ["British_SAP_250LB_Bomb_Mk5"] = 100,          --("250 lb S.A.P.")
-  ["British_SAP_500LB_Bomb_Mk5"] = 213,          --("500 lb S.A.P.")
-  ["British_AP_25LBNo1_3INCHNo1"] = 4,           --("RP-3 25lb AP Mk.I")
-  ["British_HE_60LBSAPNo2_3INCHNo1"] = 4,        --("RP-3 60lb SAP No2 Mk.I")
-  ["British_HE_60LBFNo1_3INCHNo1"] = 4,          --("RP-3 60lb F No1 Mk.I")
-  ["WGr21"] = 4,                                 --("Werfer-Granate 21 - 21 cm UnGd air-to-air rocket")
-  ["3xM8_ROCKETS_IN_TUBES"] = 4,                 --("4.5 inch M8 UnGd Rocket")
-  ["AN_M30A1"] = 45,                             --("AN-M30A1 - 100lb GP Bomb LD")
-  ["AN_M57"] = 100,                              --("AN-M57 - 250lb GP Bomb LD")
-  ["AN_M65"] = 400,                              --("AN-M65 - 1000lb GP Bomb LD")
-  ["AN_M66"] = 800,                              --("AN-M66 - 2000lb GP Bomb LD")
-  ["SC_50"] = 20,                                --("SC 50 - 50kg GP Bomb LD")
-  ["ER_4_SC50"] = 20,                            --("4 x SC 50 - 50kg GP Bomb LD")
-  ["SC_250_T1_L2"] = 100,                        --("SC 250 Type 1 L2 - 250kg GP Bomb LD")
-  ["SC_501_SC250"] = 100,                        --("SC 250 Type 3 J - 250kg GP Bomb LD")
-  ["Schloss500XIIC1_SC_250_T3_J"] = 100,         --("SC 250 Type 3 J - 250kg GP Bomb LD")
-  ["SC_501_SC500"] = 213,                        --("SC 500 J - 500kg GP Bomb LD")
-  ["SC_500_L2"] = 213,                           --("SC 500 L2 - 500kg GP Bomb LD")
-  ["SD_250_Stg"] = 100,                          --("SD 250 Stg - 250kg GP Bomb LD")
-  ["SD_500_A"] = 213,                            --("SD 500 A - 500kg GP Bomb LD")
-  ["AB_250_2_SD_2"] = 100,                       --("AB 250-2 - 144 x SD-2, 250kg CBU with HE submunitions")
-  ["AB_250_2_SD_10A"] = 100,                     --("AB 250-2 - 17 x SD-10A, 250kg CBU with 10kg Frag/HE submunitions")
-  ["AB_500_1_SD_10A"] = 213,                     --("AB 500-1 - 34 x SD-10A, 500kg CBU with 10kg Frag/HE submunitions")
-  ["AGM_114K"] = 10,
-  ["HYDRA_70_M229"] = 8,
-  ["AGM_65D"] = 130,
-  ["AGM_65E"] = 300,
-  ["AGM_65F"] = 300,
-  ["HOT3"] = 15,
-  ["AGR_20A"] = 8,
-  ["GBU_54_V_1B"] = 118,
-  
+  ["HYDRA_70_M151"] = 14,
+  ["HYDRA_70_MPP_APKWS"] = 14,
+  ["HYDRA_70_MK5"] = 14,
+  ["Vikhr_M"] = 14,  
 }
 
 
@@ -255,7 +232,7 @@ function track_wpns()
       wpnData.speed = wpnData.wpn:getVelocity()
       --wpnData.lastIP = land.getIP(wpnData.pos, wpnData.dir, 50)
     else -- wpn no longer exists, must be dead.
---      trigger.action.outText("Weapon impacted, mass of weapon warhead is " .. wpnData.exMass, 2)
+     -- trigger.action.outText("Weapon impacted, mass of weapon warhead is " .. wpnData.exMass, 2)
       local ip = land.getIP(wpnData.pos, wpnData.dir, lookahead(wpnData.speed))  -- terrain intersection point with weapon's nose.  Only search out 20 meters though.
       local impactPoint
       if not ip then -- use last calculated IP
@@ -272,11 +249,9 @@ function track_wpns()
           trigger.action.explosion(impactPoint, getWeaponExplosive(wpnData.name))
           --trigger.action.smoke(impactPoint, 0)
       end
-	  local explosive = getWeaponExplosive(wpnData.name)
-      if splash_damage_options.rocket_multiplier > 0 and wpnData.cat == Weapon.Category.ROCKET then
-        explosive = explosive * splash_damage_options.rocket_multiplier
-      end
-	  blastWave(impactPoint, splash_damage_options.blast_search_radius, wpnData.ordnance, explosive)
+      --if wpnData.cat == Weapon.Category.ROCKET then
+        blastWave(impactPoint, splash_damage_options.blast_search_radius, wpnData.ordnance, getWeaponExplosive(wpnData.name))
+      --end
       tracked_weapons[wpn_id_] = nil -- remove from tracked weapons first.         
     end
   end
@@ -459,7 +434,6 @@ end
 
 if (script_enable == 1) then
   gameMsg("SPLASH DAMAGE 2 SCRIPT RUNNING")
-  env.info("SPLASH DAMAGE 2 SCRIPT RUNNING")
   timer.scheduleFunction(function() 
       protectedCall(track_wpns)
       return timer.getTime() + refreshRate
